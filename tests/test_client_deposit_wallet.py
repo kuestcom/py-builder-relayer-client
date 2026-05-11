@@ -43,6 +43,17 @@ class TestClientDepositWallet(TestCase):
 
         mock_get.assert_called_once_with(f"http://localhost:8080/deployed?address={WALLET}")
 
+    def test_get_transactions_matches_upstream_no_builder_auth(self):
+        client = self._client()
+        builder_config = Mock()
+        client.builder_config = builder_config
+
+        with patch("py_builder_relayer_client.client.get", return_value=[]) as mock_get:
+            self.assertEqual([], client.get_transactions())
+
+        mock_get.assert_called_once_with("http://localhost:8080/transactions")
+        builder_config.generate_builder_headers.assert_not_called()
+
     def test_deploy_deposit_wallet_posts_wallet_create(self):
         client = self._client()
         resp = client.deploy_deposit_wallet()
@@ -57,6 +68,30 @@ class TestClientDepositWallet(TestCase):
         )
         self.assertEqual("test-txn", resp.transaction_id)
         self.assertEqual("0xabc", resp.transaction_hash)
+
+    def test_generate_builder_headers_matches_upstream_dict_body_signing(self):
+        client = self._client()
+        headers = Mock()
+        headers.to_dict.return_value = {"KUEST_BUILDER_SIGNATURE": "sig"}
+        builder_config = Mock()
+        builder_config.generate_builder_headers.return_value = headers
+        client.builder_config = builder_config
+
+        body = {
+            "type": TransactionType.WALLET_CREATE.value,
+            "from": ADDRESS,
+            "to": client.contract_config.deposit_wallet_factory,
+        }
+
+        self.assertEqual(
+            {"KUEST_BUILDER_SIGNATURE": "sig"},
+            client._generate_builder_headers(POST, SUBMIT_TRANSACTION, body),
+        )
+        builder_config.generate_builder_headers.assert_called_once_with(
+            POST,
+            SUBMIT_TRANSACTION,
+            str(body),
+        )
 
     def test_execute_deposit_wallet_batch_posts_wallet_request(self):
         client = self._client()
