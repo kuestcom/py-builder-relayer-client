@@ -18,7 +18,7 @@ from .endpoints import (
     SUBMIT_TRANSACTION,
 )
 from .exceptions import RelayerClientException
-from .http_helpers.helpers import get, post, POST
+from .http_helpers.helpers import get, post, GET, POST
 from .models import (
     DepositWalletCall,
     DepositWalletTransactionArgs,
@@ -56,7 +56,7 @@ class RelayClient:
         return get(f"{self.relayer_url}{GET_TRANSACTION}?id={transaction_id}")
 
     def get_transactions(self):
-        return get(f"{self.relayer_url}{GET_TRANSACTIONS}")
+        return self._get_request(GET, GET_TRANSACTIONS)
 
     def get_deployed(self, address: str) -> bool:
         deployed_payload = get(f"{self.relayer_url}{GET_DEPLOYED}?address={address}")
@@ -159,6 +159,12 @@ class RelayClient:
         if builder_headers is None:
             raise RelayerClientException("could not generate builder headers")
         return post(f"{self.relayer_url}{request_path}", headers=builder_headers, data=body)
+
+    def _get_request(self, method: str, request_path: str):
+        builder_headers = self._generate_builder_headers(method, request_path)
+        if builder_headers is None:
+            raise RelayerClientException("could not generate builder headers")
+        return get(f"{self.relayer_url}{request_path}", headers=builder_headers)
 
     def _generate_builder_headers(self, method: str, request_path: str, body: dict = None) -> Optional[dict]:
         body_for_sig = str(body) if body is not None else None

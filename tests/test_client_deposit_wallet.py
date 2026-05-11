@@ -2,9 +2,9 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from py_builder_relayer_client.client import RelayClient
-from py_builder_relayer_client.http_helpers.helpers import POST
+from py_builder_relayer_client.http_helpers.helpers import GET, POST
 from py_builder_relayer_client.models import DepositWalletCall, TransactionType
-from py_builder_relayer_client.endpoints import SUBMIT_TRANSACTION
+from py_builder_relayer_client.endpoints import GET_TRANSACTIONS, SUBMIT_TRANSACTION
 
 
 # Public Hardhat/Anvil fixture key. This is not a live credential.
@@ -43,16 +43,26 @@ class TestClientDepositWallet(TestCase):
 
         mock_get.assert_called_once_with(f"http://localhost:8080/deployed?address={WALLET}")
 
-    def test_get_transactions_matches_upstream_no_builder_auth(self):
+    def test_get_transactions_sends_builder_auth(self):
         client = self._client()
+        headers = Mock()
+        headers.to_dict.return_value = {"KUEST_BUILDER_SIGNATURE": "sig"}
         builder_config = Mock()
+        builder_config.generate_builder_headers.return_value = headers
         client.builder_config = builder_config
 
         with patch("py_builder_relayer_client.client.get", return_value=[]) as mock_get:
             self.assertEqual([], client.get_transactions())
 
-        mock_get.assert_called_once_with("http://localhost:8080/transactions")
-        builder_config.generate_builder_headers.assert_not_called()
+        mock_get.assert_called_once_with(
+            "http://localhost:8080/transactions",
+            headers={"KUEST_BUILDER_SIGNATURE": "sig"},
+        )
+        builder_config.generate_builder_headers.assert_called_once_with(
+            GET,
+            GET_TRANSACTIONS,
+            None,
+        )
 
     def test_deploy_deposit_wallet_posts_wallet_create(self):
         client = self._client()
