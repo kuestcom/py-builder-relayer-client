@@ -41,7 +41,9 @@ class RelayClient:
         builder_config: BuilderConfig = None,
         rpc_url: str = None,
     ):
-        self.relayer_url = relayer_url[0:-1] if relayer_url.endswith("/") else relayer_url
+        self.relayer_url = (
+            relayer_url[0:-1] if relayer_url.endswith("/") else relayer_url
+        )
         self.chain_id = chain_id
         self.contract_config = get_contract_config(chain_id)
         self.rpc_url = rpc_url
@@ -49,13 +51,18 @@ class RelayClient:
         self.builder_config = builder_config
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def get_nonce(self, signer_address: str, signer_type: str = TransactionType.WALLET.value):
-        return get(f"{self.relayer_url}{GET_NONCE}?address={signer_address}&type={signer_type}")
+    def get_nonce(
+        self, signer_address: str, signer_type: str = TransactionType.WALLET.value
+    ):
+        return get(
+            f"{self.relayer_url}{GET_NONCE}?address={signer_address}&type={signer_type}"
+        )
 
     def get_transaction(self, transaction_id: str):
         return get(f"{self.relayer_url}{GET_TRANSACTION}?id={transaction_id}")
 
     def get_transactions(self):
+        self.assert_builder_creds_needed()
         return self._get_request(GET, GET_TRANSACTIONS)
 
     def get_deployed(self, address: str) -> bool:
@@ -66,7 +73,9 @@ class RelayClient:
         self.assert_signer_needed()
         self.assert_builder_creds_needed()
         if not is_deposit_wallet_config_valid(self.contract_config):
-            raise RelayerClientException("Deposit Wallet contracts are not configured for this chain")
+            raise RelayerClientException(
+                "Deposit Wallet contracts are not configured for this chain"
+            )
 
         txn_request = build_deposit_wallet_create_request(
             self.signer.address(),
@@ -90,7 +99,9 @@ class RelayClient:
         if not calls:
             raise RelayerClientException("no deposit wallet calls to execute")
         if not is_deposit_wallet_config_valid(self.contract_config):
-            raise RelayerClientException("Deposit Wallet contracts are not configured for this chain")
+            raise RelayerClientException(
+                "Deposit Wallet contracts are not configured for this chain"
+            )
 
         from_address = self.signer.address()
         nonce_payload = self.get_nonce(from_address, TransactionType.WALLET.value)
@@ -120,7 +131,9 @@ class RelayClient:
     def derive_deposit_wallet(self):
         self.assert_signer_needed()
         if not is_deposit_wallet_config_valid(self.contract_config):
-            raise RelayerClientException("Deposit Wallet contracts are not configured for this chain")
+            raise RelayerClientException(
+                "Deposit Wallet contracts are not configured for this chain"
+            )
         return derive_deposit_wallet(
             self.signer.address(),
             self.contract_config.deposit_wallet_factory,
@@ -140,7 +153,11 @@ class RelayClient:
     ):
         target_states = set(states)
         poll_limit = max_polls if max_polls is not None else 10
-        poll_frequency_ms = poll_frequency if poll_frequency is not None and poll_frequency >= 1000 else 2000
+        poll_frequency_ms = (
+            poll_frequency
+            if poll_frequency is not None and poll_frequency >= 1000
+            else 2000
+        )
 
         for _ in range(poll_limit):
             transactions = self.get_transaction(transaction_id)
@@ -155,20 +172,28 @@ class RelayClient:
         return None
 
     def _post_request(self, method: str, request_path: str, body: dict = None):
+        self.assert_builder_creds_needed()
         builder_headers = self._generate_builder_headers(method, request_path, body)
         if builder_headers is None:
             raise RelayerClientException("could not generate builder headers")
-        return post(f"{self.relayer_url}{request_path}", headers=builder_headers, data=body)
+        return post(
+            f"{self.relayer_url}{request_path}", headers=builder_headers, data=body
+        )
 
     def _get_request(self, method: str, request_path: str):
+        self.assert_builder_creds_needed()
         builder_headers = self._generate_builder_headers(method, request_path)
         if builder_headers is None:
             raise RelayerClientException("could not generate builder headers")
         return get(f"{self.relayer_url}{request_path}", headers=builder_headers)
 
-    def _generate_builder_headers(self, method: str, request_path: str, body: dict = None) -> Optional[dict]:
+    def _generate_builder_headers(
+        self, method: str, request_path: str, body: dict = None
+    ) -> Optional[dict]:
         body_for_sig = str(body) if body is not None else None
-        headers = self.builder_config.generate_builder_headers(method, request_path, body_for_sig)
+        headers = self.builder_config.generate_builder_headers(
+            method, request_path, body_for_sig
+        )
         return headers.to_dict() if headers is not None else None
 
     def assert_signer_needed(self):
@@ -177,4 +202,6 @@ class RelayClient:
 
     def assert_builder_creds_needed(self):
         if self.builder_config is None:
-            raise RelayerClientException("builder credentials are required for this endpoint")
+            raise RelayerClientException(
+                "builder credentials are required for this endpoint"
+            )

@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from py_builder_relayer_client.client import RelayClient
+from py_builder_relayer_client.exceptions import RelayerClientException
 from py_builder_relayer_client.http_helpers.helpers import GET, POST
 from py_builder_relayer_client.models import DepositWalletCall, TransactionType
 from py_builder_relayer_client.endpoints import GET_TRANSACTIONS, SUBMIT_TRANSACTION
@@ -41,7 +42,9 @@ class TestClientDepositWallet(TestCase):
         ) as mock_get:
             self.assertTrue(client.get_deployed(WALLET))
 
-        mock_get.assert_called_once_with(f"http://localhost:8080/deployed?address={WALLET}")
+        mock_get.assert_called_once_with(
+            f"http://localhost:8080/deployed?address={WALLET}"
+        )
 
     def test_get_transactions_sends_builder_auth(self):
         client = self._client()
@@ -64,6 +67,18 @@ class TestClientDepositWallet(TestCase):
             None,
         )
 
+    def test_get_transactions_requires_builder_creds(self):
+        client = RelayClient(
+            relayer_url="http://localhost:8080",
+            chain_id=137,
+            private_key=TEST_PRIVATE_KEY,
+        )
+
+        with self.assertRaisesRegex(
+            RelayerClientException, "builder credentials are required"
+        ):
+            client.get_transactions()
+
     def test_deploy_deposit_wallet_posts_wallet_create(self):
         client = self._client()
         resp = client.deploy_deposit_wallet()
@@ -78,6 +93,18 @@ class TestClientDepositWallet(TestCase):
         )
         self.assertEqual("test-txn", resp.transaction_id)
         self.assertEqual("0xabc", resp.transaction_hash)
+
+    def test_deploy_deposit_wallet_requires_builder_creds(self):
+        client = RelayClient(
+            relayer_url="http://localhost:8080",
+            chain_id=137,
+            private_key=TEST_PRIVATE_KEY,
+        )
+
+        with self.assertRaisesRegex(
+            RelayerClientException, "builder credentials are required"
+        ):
+            client.deploy_deposit_wallet()
 
     def test_generate_builder_headers_matches_upstream_dict_body_signing(self):
         client = self._client()
