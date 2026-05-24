@@ -1,9 +1,9 @@
-black==24.4.2
-eth-account===0.13.0
-eth-utils==5.3.1
+black==26.5.1
+eth-account===0.13.7
+eth-utils==6.0.0
 eth_abi==5.2.0
-pytest==8.2.2
-python-dotenv==0.19.2
-requests==2.32.3
-responses==0.25.8
-kuest-py-builder-signing-sdk==2.0.0
+pytest==9.0.3
+python-dotenv==1.2.2
+requests==2.34.2
+responses==0.26.1
+kuest-py-builder-signing-sdk==2.0.1
