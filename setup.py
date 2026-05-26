@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="kuest-py-builder-relayer-client",
-    version="2.0.3",
+    version="2.0.4",
     author="Kuest Engineering",
     author_email="engineering@kuest.com",
     maintainer="Kuest Engineering",
@@ -21,7 +21,7 @@ setuptools.setup(
         "hexbytes>=1.3.1",
         "python-dotenv>=1.2.2",
         "requests>=2.34.2",
-        "kuest-py-builder-signing-sdk>=2.0.1",
+        "kuest-py-builder-signing-sdk>=2.0.2",
     ],
     project_urls={
         "Bug Tracker": "https://github.com/kuestcom/py-builder-relayer-client/issues",
