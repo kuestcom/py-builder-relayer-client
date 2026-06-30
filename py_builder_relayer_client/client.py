@@ -137,7 +137,7 @@ class RelayClient:
         return derive_deposit_wallet(
             self.signer.address(),
             self.contract_config.deposit_wallet_factory,
-            self.contract_config.deposit_wallet_implementation,
+            self.contract_config.deposit_wallet_beacon,
         )
 
     def get_expected_deposit_wallet(self):

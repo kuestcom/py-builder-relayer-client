@@ -11,6 +11,6 @@ class TestDerive(TestCase):
         wallet = derive_deposit_wallet(
             owner,
             config.deposit_wallet_factory,
-            config.deposit_wallet_implementation,
+            config.deposit_wallet_beacon,
         )
-        self.assertEqual("0x053258Cfb6124a089363F89dA04b2eFa39b34e2d", wallet)
+        self.assertEqual("0xF3ab66D34F0B14C9a4f8564Ec8baaBBf51ad0Fd6", wallet)
