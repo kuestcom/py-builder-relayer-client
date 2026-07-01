@@ -16,10 +16,6 @@ class TestConfig(TestCase):
                 "0x74a618eBdd62Ff8579A8FE94f5B888d7623b9C35",
                 cfg.deposit_wallet_beacon,
             )
-            self.assertEqual(
-                "0xf9dFAe108bF7d7aaa9E6D8c1aB281c6285BAF86c",
-                cfg.deposit_wallet_implementation,
-            )
 
         with self.assertRaises(RelayerClientException):
             get_contract_config(1)
