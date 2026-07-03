@@ -16,9 +16,6 @@ jobs:
   release:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    environment:
-      name: pypi
-      url: https://pypi.org/p/kuest-py-builder-relayer-client
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -50,7 +47,5 @@ jobs:
 
       - run: python -m build --sdist --wheel
 
-      - name: Publish to PyPI
+      - name: Publish to PyPI (OIDC)
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
