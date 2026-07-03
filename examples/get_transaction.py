@@ -8,9 +8,7 @@ load_dotenv()
 
 def main():
     print("starting...")
-    relayer_url = os.getenv(
-        "RELAYER_URL", ""
-    )
+    relayer_url = os.getenv("RELAYER_URL", "")
     chain_id = int(os.getenv("CHAIN_ID", 80002))
     client = RelayClient(relayer_url, chain_id)
 

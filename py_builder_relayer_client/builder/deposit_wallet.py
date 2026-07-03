@@ -12,7 +12,6 @@ from ..models import (
 )
 from ..signer import Signer
 
-
 DEPOSIT_WALLET_TYPES = {
     "EIP712Domain": [
         {"name": "name", "type": "string"},

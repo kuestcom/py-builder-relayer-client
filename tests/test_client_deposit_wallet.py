@@ -7,7 +7,6 @@ from py_builder_relayer_client.http_helpers.helpers import GET, POST
 from py_builder_relayer_client.models import DepositWalletCall, TransactionType
 from py_builder_relayer_client.endpoints import GET_TRANSACTIONS, SUBMIT_TRANSACTION
 
-
 # Public Hardhat/Anvil fixture key. This is not a live credential.
 TEST_PRIVATE_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"

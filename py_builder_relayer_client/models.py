@@ -53,7 +53,9 @@ class DepositWalletBatchRequest:
             "depositWalletParams": {
                 "depositWallet": self.deposit_wallet,
                 "deadline": self.deadline,
-                "calls": [c.to_dict() if hasattr(c, "to_dict") else c for c in self.calls],
+                "calls": [
+                    c.to_dict() if hasattr(c, "to_dict") else c for c in self.calls
+                ],
             },
         }
 

@@ -10,8 +10,12 @@ class ContractConfig:
     deposit_wallet_beacon: str
 
 
-DEPOSIT_WALLET_FACTORY = to_checksum_address("0x2CcdC6C5dDcd895aFcCD259F291de9b618A5cA6c")
-DEPOSIT_WALLET_BEACON = to_checksum_address("0x74a618eBdd62Ff8579A8FE94f5B888d7623b9C35")
+DEPOSIT_WALLET_FACTORY = to_checksum_address(
+    "0x2CcdC6C5dDcd895aFcCD259F291de9b618A5cA6c"
+)
+DEPOSIT_WALLET_BEACON = to_checksum_address(
+    "0x74a618eBdd62Ff8579A8FE94f5B888d7623b9C35"
+)
 
 CONFIG = {
     137: ContractConfig(
