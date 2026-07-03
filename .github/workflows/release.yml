@@ -16,6 +16,9 @@ jobs:
   release:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    environment:
+      name: pypi
+      url: https://pypi.org/p/kuest-py-builder-relayer-client
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -24,6 +27,15 @@ jobs:
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: "3.10"
+
+      - name: Check release tag
+        run: |
+          VERSION=$(python setup.py --version)
+          TAG="${GITHUB_REF_NAME#v}"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "::error::Release tag v$TAG does not match setup.py version $VERSION"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: |
